@@ -40,7 +40,7 @@ def update_graph():
 
         response = "".join(raw_response).split('=')
 
-        Y.append(response[2].split(' ')[0])
+        Y.append(response[2].split('ms')[0])
         X.append(X[-1] + 1)
 
     except CalledProcessError as e:
@@ -53,8 +53,9 @@ def update_graph():
         y = list(Y),
         name = 'scatter',
         mode = 'lines+markers',
+        fill = 'tozeroy'
     )
-    return {'data': [data], 'layout': go.Layout(title=f"latency: {response[2].split(' ')[0]} ms", xaxis = dict(range=[min(X), max(X)]),
+    return {'data': [data], 'layout': go.Layout(title=f"latency: {response[2].split('ms')[0]} ms", xaxis = dict(range=[min(X), max(X)]),
                                                 yaxis = dict(range=[0, int(max(Y)) + 100 ]))}
 
 if __name__ == '__main__':

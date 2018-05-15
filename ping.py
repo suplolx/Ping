@@ -22,16 +22,14 @@ try:
 
             response = "".join(raw_response).split('=')
 
-            results['ping'].append(int(response[2].split(' ')[0]))
+            results['ping'].append(int(response[2].split('ms')[0]))
             results['time'].append(datetime.now().strftime(time_format))
 
-            print(f"[*] ping: {response[2].split(' ')[0]} ms | Max: {max(results['ping'])} ms | Min: {min(results['ping'])} ms",
+            print(f"[*] {datetime.now().strftime(time_format)} | ping: {response[2].split('ms')[0]} ms | Min: {min(results['ping'])} ms | Max: {max(results['ping'])} ms",
                   flush=True, end='\r')
 
         except CalledProcessError as e:
-            # results['ping'].append(0)
-            # results['time'].append(datetime.now().strftime(time_format))
-            print("Time-out\n")
+            print(f"Time-out | {datetime.now().strftime(time_format)}", flush=True, end='\r')
 
         time.sleep(1)
 
