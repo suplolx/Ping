@@ -20,7 +20,7 @@ try:
         try:
             raw_response = check_output(['ping', host, '-n', '1'], universal_newlines=True)
 
-            response = "".join(raw_response).split('=')
+            response = "".join(raw_response).replace("<", '=').split('=')
 
             results['ping'].append(int(response[2].split('ms')[0]))
             results['time'].append(datetime.now().strftime(time_format))
@@ -36,6 +36,7 @@ try:
 except KeyboardInterrupt:
     with open("ping.json", 'w') as pingtest:
         json.dump(results, pingtest)
+        print("\n")
         print("[*} Klaar")
         print(f"[*] Max: {int(max(results['ping']))}")
         print(f"[*] Min: {int(min(results['ping']))}")

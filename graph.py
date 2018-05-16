@@ -14,7 +14,7 @@ app.layout = html.Div(children=[
     dcc.Graph(id='example',
               figure= {
                   'data': [
-                      {'x': pingdata['time'], 'y': pingdata['ping'], 'type': 'line', 'name': 'ms', 'fill': 'tozeroy'}
+                      {'x': pingdata['time'], 'y': pingdata['ping'], 'type': 'line', 'name': 'ms',}
                   ],
                   'layout': {
                       'title': 'Pingtest',

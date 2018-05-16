@@ -1,5 +1,5 @@
 import dash
-from dash.dependencies import Output, Event
+from dash.dependencies import Output, Event, Input
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly
@@ -23,7 +23,14 @@ timenow = datetime.now().strftime("%Y-%d-%m %H:%M:%S")
 
 app = dash.Dash(__name__)
 app.layout = html.Div(
-    [
+    [   
+        dcc.Dropdown(id='id-host-name',
+                     options=[
+                         {'label': 'Internet', 'value': '8.8.8.8'},
+                         {'label': 'Router', 'value': '192.168.2.254'},
+                     ],
+                     value="8.8.8.8"
+                     ),
         dcc.Graph(id='live-graph', animate=True),
         dcc.Interval(
             id='graph-update',
@@ -33,14 +40,15 @@ app.layout = html.Div(
 )
 
 @app.callback(Output('live-graph', 'figure'),
+              [Input('id-host-name', 'value')],
               events = [Event('graph-update', 'interval')])
-def update_graph():
+def update_graph(value):
     try:
-        raw_response = check_output(['ping', host, '-n', '1'], universal_newlines=True)
+        raw_response = check_output(['ping', value, '-n', '1'], universal_newlines=True)
 
-        response = "".join(raw_response).split('=')
+        response = "".join(raw_response).replace("<", '=').split('=')
 
-        Y.append(response[2].split('ms')[0])
+        Y.append(response[2].split('ms')[0].strip('<'))
         X.append(X[-1] + 1)
 
     except CalledProcessError as e:
@@ -52,7 +60,7 @@ def update_graph():
         x = list(X),
         y = list(Y),
         name = 'scatter',
-        mode = 'lines+markers',
+        mode = 'lines',
         fill = 'tozeroy'
     )
     return {'data': [data], 'layout': go.Layout(title=f"latency: {response[2].split('ms')[0]} ms", xaxis = dict(range=[min(X), max(X)]),
