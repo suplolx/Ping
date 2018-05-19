@@ -2,3 +2,4 @@
 ping.json/
 ping.json
 *.json
+__pycache__

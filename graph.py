@@ -5,7 +5,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 
-with open('ping.json') as f:
+with open('data\\ping.json') as f:
     pingdata = json.load(f)
 
 app = dash.Dash()

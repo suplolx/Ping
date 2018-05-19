@@ -7,7 +7,7 @@ import plotly.graph_objs as go
 from collections import deque
 import psutil
 
-from subprocess import check_output, CalledProcessError
+from utils import utils
 
 
 bytes_recv = deque(maxlen=20)
@@ -27,6 +27,8 @@ bytes_sent.append(psutil.net_io_counters().bytes_sent)
 
 
 app = dash.Dash(__name__)
+
+ping = utils.Ping("8.8.8.8")
 
 app.layout = html.Div([
     html.Div(
@@ -52,19 +54,16 @@ app.layout = html.Div([
 @app.callback(Output('ping-live-graph', 'figure'),
               events = [Event('graph-update', 'interval')])
 def update_graph():
-    try:
-        raw_response = check_output(['ping', '8.8.8.8', '-n', '1'], universal_newlines=True)
+    response = ping.get_ping()
 
-        response = "".join(raw_response).replace("<", '=').split('=')
-
-        latency.append(response[2].split('ms')[0].strip('<'))
-        X3.append(X3[-1] + 1)
-
-    except CalledProcessError as e:
+    if response == 'time-out':
         latency.append('0')
         X3.append(X3[-1] + 1)
 
-
+    else:
+        latency.append(response[2].split('ms')[0].strip('<'))
+        X3.append(X3[-1] + 1)
+      
     data = go.Scatter(
         x = list(X3),
         y = list(latency),
