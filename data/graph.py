@@ -1,11 +1,14 @@
 import json
 import time
+import os
 
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 
-with open("data\\ping.json") as f:
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+with open(os.path.join(base_dir, "data", "ping.json")) as f:
     pingdata = json.load(f)
 
 app = dash.Dash()
@@ -14,7 +17,7 @@ app.layout = html.Div(children=[
     dcc.Graph(id="example",
               figure= {
                   "data": [
-                      {"x": pingdata["time"], "y": pingdata["ping"], "type": "line", "name": "ms",}
+                      {"x": pingdata["time"], "y": pingdata["ping"], "type": "line", "name": "latency",},
                   ],
                   "layout": {
                       "title": "Pingtest",
@@ -31,6 +34,7 @@ app.layout = html.Div(children=[
                   }
               })
 ])
+
 
 if __name__ == "__main__":
     app.run_server(debug=True)

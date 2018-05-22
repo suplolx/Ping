@@ -1,4 +1,7 @@
 from subprocess import check_output, CalledProcessError
+from collections import deque
+import psutil
+
 
 
 class Ping(object):
@@ -12,7 +15,29 @@ class Ping(object):
             response = "".join(raw_response).replace("<", "=").split("=")
         except CalledProcessError:
             response = "time-out"
-        return response[2].split('ms')[0].strip('<')
+        return response
+
+
+
+class NetSpeed(object):
+
+    bytes_recv = deque(maxlen=20)
+    bytes_sent = deque(maxlen=20)
+    bytes_recv.append(psutil.net_io_counters().bytes_recv)
+    bytes_sent.append(psutil.net_io_counters().bytes_sent)
+    
+    def download_speed(self):
+        bytes_recv_start = psutil.net_io_counters().bytes_recv
+        bps_recv = bytes_recv_start - self.bytes_recv[-1]
+        self.bytes_recv.append(bytes_recv_start)
+        return round(bps_recv / 2**20, 2)
+    
+    def upload_speed(self):
+        bytes_sent_start = psutil.net_io_counters().bytes_sent
+        bps_sent = bytes_sent_start - self.bytes_sent[-1]
+        self.bytes_sent.append(bytes_sent_start)
+        return round(bps_sent / 2**20, 2)
+
 
 
 def start_message():

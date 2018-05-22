@@ -10,8 +10,6 @@ import psutil
 import lib.utils as utils
 
 
-bytes_recv = deque(maxlen=20)
-bytes_sent = deque(maxlen=20)
 mbs_recv = deque(maxlen=20)
 mbs_sent = deque(maxlen=20)
 latency = deque(maxlen=20)
@@ -22,13 +20,13 @@ X3 = deque(maxlen=20)
 X.append(1)
 X2.append(1)
 X3.append(1)
-bytes_recv.append(psutil.net_io_counters().bytes_recv)
-bytes_sent.append(psutil.net_io_counters().bytes_sent)
 
 
 app = dash.Dash(__name__)
 
 ping = utils.Ping("8.8.8.8")
+speed_test = utils.NetSpeed()
+
 
 app.layout = html.Div([
     html.Div(
@@ -61,7 +59,7 @@ def update_graph():
         X3.append(X3[-1] + 1)
 
     else:
-        latency.append(response)
+        latency.append(response[2].split('ms')[0].strip('<'))
         X3.append(X3[-1] + 1)
       
     data = go.Scatter(
@@ -79,10 +77,7 @@ def update_graph():
 @app.callback(Output("download-live-graph", "figure"),
                      events= [Event("graph-update", "interval")])
 def download_update_graph():
-    bytes_recv_start = psutil.net_io_counters().bytes_recv
-    bps_recv = bytes_recv_start - bytes_recv[-1]
-    bytes_recv.append(bytes_recv_start)
-    mbs_recv.append(round(bps_recv / 2**20, 2))
+    mbs_recv.append(speed_test.download_speed())
 
     X.append(X[-1] + 1)
 
@@ -105,10 +100,7 @@ def download_update_graph():
 @app.callback(Output("upload-live-graph", "figure"),
                      events= [Event("graph-update", "interval")])
 def upload_update_graph():
-    bytes_sent_start = psutil.net_io_counters().bytes_sent
-    bps_sent = bytes_sent_start - bytes_sent[-1]
-    bytes_sent.append(bytes_sent_start)
-    mbs_sent.append(round(bps_sent / 2**20, 2))
+    mbs_sent.append(speed_test.upload_speed())
 
     X2.append(X2[-1] + 1)
 
