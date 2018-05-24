@@ -43,9 +43,8 @@ try:
 except KeyboardInterrupt:
     utils.eind_message(results)
 
-    if not os.path.exists("data"):
+    if not os.path.exists(os.path.join(base_dir, "app", "data")):
         os.mkdir("data")
-    with open(os.path.join(base_dir, "data", "ping.json"), "w") as pingtest:
+    with open(os.path.join(base_dir, "app", "data", "ping.json"), "w") as pingtest:
         json.dump(results, pingtest)
         input("\nDruk op enter om het bestand op te slaan.")
-    
